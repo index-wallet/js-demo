@@ -18,6 +18,7 @@ let inputCurrencyOne,
 	inputCurrencyTwoAmount,
 	inputPrice,
 	inputDemand;
+const autoValuationType = "DeGrootUnweighted";
 
 function setup() {
 	createCanvas(400, 600);
@@ -42,6 +43,10 @@ function setup() {
 				},
 				demand: random(0.5, 1.5),
 			};
+
+			if (autoValuationType === "WalletVector") {
+				grid[i][j].currencyTwo = random();
+			}
 		}
 	}
 
@@ -449,73 +454,22 @@ function createVendorButtons(square) {
 	dynamicControls.push(buttonLeft);
 }
 
-// function mouseClicked() {
-//   let i = Math.floor(mouseX / w);
-//   let j = Math.floor(mouseY / w);
-
-//   if (mouseX >= 0 && mouseX < width && mouseY >= 0 && mouseY < height - 200) {
-//     if (i >= 0 && i < cols && j >= 0 && j < rows) {
-//       if (isSquareSelected && selectedSquare.i === i && selectedSquare.j === j) {
-//         // If the clicked square is already selected, deselect it
-//         isSquareSelected = false;
-//         clearDynamicControls();
-//       } else {
-//         // Select the clicked square
-//         selectedSquare = { i, j };
-//         isSquareSelected = true;
-//         clearDynamicControls();
-//         displayControlPanel();
-//       }
-//     } else {
-//       // Deselect if clicked outside valid grid area
-//       isSquareSelected = false;
-//       clearDynamicControls();
-//     }
-//   }
-// }
-
 function processEconomyStep() {
-	let relationships = [];
+	switch (autoValuationType) {
+		case "DeGrootUnweighted":
+			pesDeGrootUnweighted(grid, cols, rows);
+			break;
+		case "DeGrootWeighted":
+			pesDeGrootWeighted(grid, cols, rows);
+			break;
+		case "WalletVector":
+			pesWalletVector(grid, cols, rows);
+			break;
 
-	// Collect customer-vendor relationships
-	for (let i = 0; i < cols; i++) {
-		for (let j = 0; j < rows; j++) {
-			let directions = ["top", "right", "bottom", "left"];
-			directions.forEach((dir) => {
-				if (grid[i][j][dir]) {
-					let target = getTargetSquare(i, j, dir);
-					if (target) {
-						relationships.push({ customer: { i, j }, vendor: target });
-					}
-				}
-			});
-		}
+		default:
+			console.error("Unrecognized automatic valuation type!");
+			break;
 	}
-
-	// Shuffle relationships to ensure a random order
-	shuffleArray(relationships);
-
-	relationships.forEach((rel) => {
-		let customerSquare = grid[rel.customer.i][rel.customer.j];
-		let vendorSquare = grid[rel.vendor.i][rel.vendor.j];
-
-		let payment = calculatePayment(customerSquare, vendorSquare);
-		let cost = calculateCost(payment, customerSquare);
-
-		// Check if the transaction should occur based on demand, cost, and available funds
-		if (
-			cost < customerSquare.demand &&
-			payment.every((amount) => amount >= 0) &&
-			customerSquare.currencyOne >= payment[0] &&
-			customerSquare.currencyTwo >= payment[1]
-		) {
-			// Transaction occurs
-			customerSquare.currencyOne -= payment[0];
-			customerSquare.currencyTwo -= payment[1];
-			vendorSquare.currencyOne += payment[0];
-			vendorSquare.currencyTwo += payment[1];
-		}
-	});
 }
 
 function calculatePayment(customerSquare, vendorSquare) {
