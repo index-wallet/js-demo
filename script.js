@@ -18,7 +18,7 @@ let inputCurrencyOne,
 	inputCurrencyTwoAmount,
 	inputPrice,
 	inputDemand;
-const autoValuationType = "DeGrootUnweighted";
+const autoValuationType = "WalletVector";
 
 function setup() {
 	createCanvas(400, 600);
@@ -35,7 +35,7 @@ function setup() {
 				bottom: random(1) < connectivity,
 				left: random(1) < connectivity,
 				currencyOne: random(),
-				currencyTwo: 0,
+				currencyTwo: random(),
 				price: random(0.1, 1),
 				valuation: {
 					currencyOne: random(),
@@ -44,9 +44,9 @@ function setup() {
 				demand: random(0.5, 1.5),
 			};
 
-			if (autoValuationType === "WalletVector") {
+			/* if (autoValuationType === "WalletVector") {
 				grid[i][j].currencyTwo = random();
-			}
+			} */
 		}
 	}
 
@@ -455,21 +455,25 @@ function createVendorButtons(square) {
 }
 
 function processEconomyStep() {
-	switch (autoValuationType) {
-		case "DeGrootUnweighted":
-			pesDeGrootUnweighted(grid, cols, rows);
-			break;
-		case "DeGrootWeighted":
-			pesDeGrootWeighted(grid, cols, rows);
-			break;
-		case "WalletVector":
-			pesWalletVector(grid, cols, rows);
-			break;
-
-		default:
-			console.error("Unrecognized automatic valuation type!");
-			break;
-	}
+	pesLPOptim(grid, cols, rows);
+	// switch (autoValuationType) {
+	// 	case "Constant":
+	// 		pesConstantValuations(grid, cols, rows);
+	// 		break;
+	// 	case "DeGrootUnweighted":
+	// 		pesDeGrootUnweighted(grid, cols, rows);
+	// 		break;
+	// 	case "DeGrootWeighted":
+	// 		pesDeGrootWeighted(grid, cols, rows);
+	// 		break;
+	// 	case "WalletVector":
+	// 		pesWalletVector(grid, cols, rows);
+	// 		break;
+	//
+	// 	default:
+	// 		console.error("Unrecognized automatic valuation type!");
+	// 		break;
+	// }
 }
 
 function calculatePayment(customerSquare, vendorSquare) {
