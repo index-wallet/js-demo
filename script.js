@@ -35,7 +35,7 @@ function setup() {
 				bottom: random(1) < connectivity,
 				left: random(1) < connectivity,
 				currencyOne: random(),
-				currencyTwo: random(),
+				currencyTwo: 0,
 				price: random(0.1, 1),
 				valuation: {
 					currencyOne: random(),
