@@ -455,7 +455,7 @@ function createVendorButtons(square) {
 }
 
 function processEconomyStep() {
-	pesLPOptim(grid, cols, rows);
+	pesDeGrootWeighted(grid, cols, rows);
 	// switch (autoValuationType) {
 	// 	case "Constant":
 	// 		pesConstantValuations(grid, cols, rows);
